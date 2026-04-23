@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoleaStay — Caution de séjour / Security Deposit</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+:root{--black:#0c0b0a;--warm-white:#f8f5f0;--gold:#b8935a;--gold-light:#d4a96a;--stone:#e8e2d9;--muted:#8a8278;--text:#2a2520;--success:#4a7c59;--error:#8b2c2c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+.lang-bar{background:var(--black);padding:0.5rem 1.5rem;display:flex;justify-content:flex-end;gap:0.5rem;}
+.lang-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;padding:0.2rem 0.6rem;cursor:pointer;transition:all 0.2s;}
+.lang-btn.active{border-color:var(--gold);color:var(--gold);}
+header{background:var(--black);padding:1.5rem;text-align:center;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;letter-spacing:4px;color:var(--warm-white);text-transform:uppercase;}
+.logo span{color:var(--gold);}
+.logo-sub{font-size:0.6rem;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:0.3rem;}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+.card{background:white;max-width:480px;width:100%;padding:2.5rem;box-shadow:0 4px 30px rgba(0,0,0,0.08);}
+.card-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--stone);}
+.card-icon{font-size:2rem;margin-bottom:0.8rem;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:0.3rem;}
+.card-sub{font-size:0.75rem;color:var(--muted);letter-spacing:1px;}
+.amount-display{background:var(--black);color:white;padding:1.2rem;text-align:center;margin-bottom:2rem;}
+.amount-label{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:0.3rem;}
+.amount-value{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:300;}
+.amount-note{font-size:0.65rem;color:rgba(255,255,255,0.3);display:block;margin-top:0.2rem;letter-spacing:1px;}
+.form-group{margin-bottom:1.1rem;}
+.form-label{display:block;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.form-input{width:100%;padding:0.75rem 1rem;border:1px solid var(--stone);background:var(--warm-white);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--text);outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--gold);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+#card-element{padding:0.75rem 1rem;border:1px solid var(--stone);background:var(--warm-white);margin-bottom:0.3rem;}
+#card-errors{font-size:0.7rem;color:var(--error);min-height:1rem;}
+.info-box{background:rgba(74,124,89,0.06);border-left:3px solid var(--success);padding:1rem 1.2rem;margin:1.2rem 0;font-size:0.75rem;color:var(--muted);line-height:1.7;}
+.info-box strong{color:var(--success);}
+.btn-pay{width:100%;padding:1rem;background:var(--gold);color:var(--black);border:none;font-family:'DM Sans',sans-serif;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-top:1.2rem;}
+.btn-pay:hover{background:var(--gold-light);}
+.btn-pay:disabled{opacity:0.5;cursor:not-allowed;}
+.spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:var(--black);border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.btn-pay.loading .spinner{display:block;}
+.btn-pay.loading .btn-text{opacity:0.5;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.secure-row{display:flex;justify-content:center;gap:1.5rem;margin-top:0.8rem;}
+.secure-badge{font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.success-card{display:none;text-align:center;padding:2rem;}
+.success-card.show{display:block;}
+.success-icon{font-size:3rem;margin-bottom:1rem;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:1rem;}
+.success-text{font-size:0.82rem;color:var(--muted);line-height:1.8;}
+footer{background:var(--black);padding:1.5rem;text-align:center;}
+footer p{font-size:0.65rem;color:rgba(255,255,255,0.3);letter-spacing:1px;}
+footer a{color:var(--gold);text-decoration:none;}
+.lang-fr [data-en]{display:none!important;}
+.lang-en [data-fr]{display:none!important;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}.card{padding:1.5rem;}}
+</style>
+</head>
+<body class="lang-fr">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+</div>
+
+<header>
+  <div class="logo">Solea<span>Stay</span></div>
+  <div class="logo-sub" data-fr>Caution de séjour</div>
+  <div class="logo-sub" data-en>Security Deposit</div>
+</header>
+
+<main>
+  <div class="card">
+    <div id="form-section">
+      <div class="card-header">
+        <div class="card-icon">🔒</div>
+        <h1 class="card-title" data-fr>Caution de séjour</h1>
+        <h1 class="card-title" data-en>Security Deposit</h1>
+        <p class="card-sub" data-fr>Appartement SoleaStay — Marseille Centre</p>
+        <p class="card-sub" data-en>SoleaStay Apartment — Marseille City Centre</p>
+      </div>
+
+      <div class="amount-display">
+        <span class="amount-label" data-fr>Caution bloquée</span>
+        <span class="amount-label" data-en>Deposit blocked</span>
+        <div class="amount-value">€100</div>
+        <span class="amount-note" data-fr>Jamais débité — libéré 24h après votre départ</span>
+        <span class="amount-note" data-en>Never charged — released 24h after checkout</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-fr>Prénom & Nom</label>
+        <label class="form-label" data-en>First & Last Name</label>
+        <input type="text" class="form-input" id="guest-name" placeholder="Marie Dupont">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="guest-email" placeholder="marie@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-fr>Téléphone</label>
+        <label class="form-label" data-en>Phone</label>
+        <input type="tel" class="form-input" id="guest-phone" placeholder="+33 6 xx xx xx xx">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-fr>Date d'arrivée</label>
+          <label class="form-label" data-en>Check-in date</label>
+          <input type="date" class="form-input" id="checkin">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-fr>Date de départ</label>
+          <label class="form-label" data-en>Check-out date</label>
+          <input type="date" class="form-input" id="checkout">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-fr>Carte bancaire</label>
+        <label class="form-label" data-en>Card details</label>
+        <div id="card-element"></div>
+        <div id="card-errors"></div>
+      </div>
+      <div class="info-box">
+        <strong data-fr>✅ Cette somme est BLOQUÉE — jamais débitée</strong>
+        <strong data-en>✅ This amount is BLOCKED — never charged</strong><br>
+        <span data-fr>Votre carte sera autorisée pour €100 mais aucun débit n'aura lieu. La caution sera libérée automatiquement 24h après votre départ si l'appartement est en bon état.</span>
+        <span data-en>Your card will be authorized for €100 but no charge will occur. The deposit will be automatically released 24h after your departure if the apartment is in good condition.</span>
+      </div>
+      <button class="btn-pay" id="pay-btn" onclick="handleDeposit()">
+        <div class="spinner" id="spinner"></div>
+        <span class="btn-text" data-fr>Autoriser la caution de €100 →</span>
+        <span class="btn-text" data-en>Authorize €100 deposit →</span>
+      </button>
+      <div class="secure-row">
+        <span class="secure-badge">🔒 SSL</span>
+        <span class="secure-badge">💳 Stripe</span>
+        <span class="secure-badge">✓ PCI</span>
+      </div>
+    </div>
+
+    <div class="success-card" id="success-card">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title" data-fr>Caution enregistrée !</h2>
+      <h2 class="success-title" data-en>Deposit registered!</h2>
+      <p class="success-text" data-fr>Votre caution de €100 a été enregistrée avec succès. Un email de confirmation vous a été envoyé.<br><br>À bientôt à Marseille ! 🌊<br><br><small>La caution sera libérée automatiquement 24h après votre départ.</small></p>
+      <p class="success-text" data-en>Your €100 deposit has been successfully registered. A confirmation email has been sent to you.<br><br>See you soon in Marseille! 🌊<br><br><small>The deposit will be automatically released 24h after your departure.</small></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>SoleaStay · 7 Rue de la Prison, 13002 Marseille · <a href="mailto:soleastay.marseille@gmail.com">soleastay.marseille@gmail.com</a> · <a href="tel:+33652557141">+33 6 52 55 71 41</a></p>
+</footer>
+
+<script>
+const CONFIG = {
+  stripeKey: 'pk_live_51PveDWJfDlTGmoIvicL7k5MCiVE8VSYdDjjmPo2Ku9JHO5GRDM6lPCLVVsmjAfRuSfOBo4zaUnGuJFVhMB0jVbKF00EXQ50occ',
+  apiUrl: 'https://soleastay-backend-production.up.railway.app',
+};
+
+function setLang(lang) {
+  document.body.className = 'lang-' + lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === lang));
+}
+
+// Init Stripe
+const stripe = Stripe(CONFIG.stripeKey);
+const elements = stripe.elements();
+const cardElement = elements.create('card', {
+  style: {
+    base: { fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2a2520', '::placeholder': { color: '#8a8278' } },
+    invalid: { color: '#8b2c2c' }
+  }
+});
+cardElement.mount('#card-element');
+cardElement.on('change', e => {
+  document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+});
+
+// Set min date to today
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('checkin').min = today;
+document.getElementById('checkout').min = today;
+
+async function handleDeposit() {
+  const name = document.getElementById('guest-name').value.trim();
+  const email = document.getElementById('guest-email').value.trim();
+  const phone = document.getElementById('guest-phone').value.trim();
+  const checkIn = document.getElementById('checkin').value;
+  const checkOut = document.getElementById('checkout').value;
+
+  if (!name || !email || !checkIn || !checkOut) {
+    alert(document.body.classList.contains('lang-fr') ? 'Veuillez remplir tous les champs obligatoires.' : 'Please fill in all required fields.');
+    return;
+  }
+
+  const btn = document.getElementById('pay-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${CONFIG.apiUrl}/create-deposit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guestName: name, guestEmail: email, guestPhone: phone, checkIn, checkOut }),
+    });
+
+    if (!res.ok) throw new Error('Backend error');
+    const { clientSecret } = await res.json();
+
+    const { error } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardElement, billing_details: { name, email } }
+    });
+
+    if (error) throw error;
+
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-card').classList.add('show');
+
+  } catch (err) {
+    document.getElementById('card-errors').textContent = err.message || 'Une erreur est survenue.';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
