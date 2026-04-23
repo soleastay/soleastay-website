@@ -770,7 +770,7 @@ footer{background:var(--black);color:rgba(248,245,240,0.4);padding:4rem 0 2rem;}
           <div class="price-row"><span id="nights-label"></span><span class="val" id="nights-total"></span></div>
           <div class="price-row" id="weekend-row" style="display:none;"><span data-fr>Supplément week-end</span><span data-en>Weekend supplement</span><span class="val" id="weekend-total"></span></div>
           <div class="price-row"><span data-fr>🧹 Frais de ménage</span><span data-en>🧹 Cleaning fee</span><span class="val">€45</span></div>
-          <div class="price-row"><span data-fr>🔒 Caution (bloquée)</span><span data-en>🔒 Deposit (blocked)</span><span class="val">€100</span></div>
+          <div class="price-row" style="color:rgba(248,245,240,0.35);"><span data-fr>🔒 Caution €100 — lien envoyé 7j avant arrivée</span><span data-en>🔒 €100 deposit — link sent 7 days before arrival</span><span class="val">gratuit</span></div>
           <div class="price-row total"><span data-fr>Total débité</span><span data-en>Total charged</span><span class="val" id="total-val"></span></div>
           <div class="price-row savings-row" id="savings-row"><span data-fr>💚 Économie vs Airbnb</span><span data-en>💚 Saving vs Airbnb</span><span class="val" id="savings-val"></span></div>
         </div>
@@ -825,17 +825,17 @@ footer{background:var(--black);color:rgba(248,245,240,0.4);padding:4rem 0 2rem;}
             <div id="card-errors"></div>
           </div>
           <div class="deposit-notice">
-            <strong data-fr>🔒 Caution €100 — bloquée seulement, jamais débitée</strong>
-            <strong data-en>🔒 €100 deposit — blocked only, never charged</strong><br>
-            <span data-fr>Autorisée sur votre carte à la réservation. Libérée automatiquement 24h après votre départ si l'appartement est en bon état.</span>
-            <span data-en>Authorized on your card at booking. Automatically released 24h after departure if apartment is in good condition.</span>
+            <strong data-fr>🔒 Caution €100 — envoyée 7 jours avant votre arrivée</strong>
+            <strong data-en>🔒 €100 deposit — sent 7 days before your arrival</strong><br>
+            <span data-fr>Vous recevrez un email 7 jours avant votre arrivée avec un lien pour autoriser la caution. Elle sera libérée 24h après votre départ.</span>
+            <span data-en>You will receive an email 7 days before arrival with a link to authorize the deposit. Released 24h after checkout.</span>
           </div>
           <div class="total-box">
             <div>
               <span class="lbl" data-fr>Total à payer</span>
               <span class="lbl" data-en>Total to pay</span>
-              <div style="font-size:0.6rem;color:rgba(248,245,240,0.3);margin-top:0.2rem;" data-fr>Dont €45 ménage + €100 caution</div>
-              <div style="font-size:0.6rem;color:rgba(248,245,240,0.3);margin-top:0.2rem;" data-en>Incl. €45 cleaning + €100 deposit</div>
+              <div style="font-size:0.6rem;color:rgba(248,245,240,0.3);margin-top:0.2rem;" data-fr>Dont €45 frais de ménage inclus</div>
+              <div style="font-size:0.6rem;color:rgba(248,245,240,0.3);margin-top:0.2rem;" data-en>Incl. €45 cleaning fee</div>
             </div>
             <span class="amount">€<span id="total-amount">—</span></span>
           </div>
@@ -1329,7 +1329,7 @@ function updateBookingCard() {
   
   const weekendExtra = weekendNights * pricing.weekendSupplement;
   const subtotal = nightsTotal + weekendExtra;
-  const total = subtotal + pricing.cleaningFee + pricing.deposit;
+  const total = subtotal + pricing.cleaningFee;
   
   // Airbnb equivalent (add ~15% fees)
   const airbnbPrice = Math.round((subtotal + pricing.cleaningFee) * 1.15) + pricing.cleaningFee;
@@ -1414,6 +1414,7 @@ async function handlePayment() {
       d.setDate(d.getDate() + 1);
     }
     const total = nightsTotal + pricing.cleaningFee;
+    // Note: deposit NOT included — sent separately 7 days before check-in
 
     const res = await fetch(`${CONFIG.apiUrl}/create-payment-intent`, {
       method: 'POST',
