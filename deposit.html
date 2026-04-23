@@ -60,13 +60,18 @@ footer a{color:var(--gold);text-decoration:none;}
 </head>
 <body class="lang-fr">
 
-<div class="lang-bar">
-  <button class="lang-btn active" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn" onclick="setLang('en')">EN</button>
+<div class="lang-bar" style="justify-content:space-between;">
+  <a href="https://soleastay.com" style="color:var(--gold);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">
+    <span data-fr>← Accueil</span><span data-en>← Home</span>
+  </a>
+  <div style="display:flex;gap:0.5rem;">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
 </div>
 
 <header>
-  <div class="logo">Solea<span>Stay</span></div>
+  <a href="https://soleastay.com" style="text-decoration:none;"><div class="logo">Solea<span>Stay</span></div></a>
   <div class="logo-sub" data-fr>Caution de séjour</div>
   <div class="logo-sub" data-en>Security Deposit</div>
 </header>
