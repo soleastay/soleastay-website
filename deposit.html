@@ -4,159 +4,736 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SoleaStay — Caution de séjour / Security Deposit</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://js.stripe.com/v3/"></script>
 <style>
-:root{--black:#0c0b0a;--warm-white:#f8f5f0;--gold:#b8935a;--gold-light:#d4a96a;--stone:#e8e2d9;--muted:#8a8278;--text:#2a2520;--success:#4a7c59;--error:#8b2c2c;}
+:root{
+  --ink:#1a1612;
+  --ink-soft:#2d251e;
+  --cream:#faf6ef;
+  --cream-warm:#f3ede1;
+  --sand:#e8dfce;
+  --gold:#9a7b3f;
+  --gold-light:#c5a467;
+  --gold-glow:rgba(154,123,63,0.12);
+  --text:#3d342a;
+  --text-soft:#7a6f60;
+  --text-muted:#a89e8c;
+  --line:#e0d6c2;
+  --success:#5a7a4f;
+  --error:#a04848;
+  --shadow-soft:0 1px 2px rgba(26,22,18,0.04), 0 8px 24px rgba(26,22,18,0.06);
+  --shadow-card:0 1px 3px rgba(26,22,18,0.05), 0 20px 60px -10px rgba(26,22,18,0.12);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
-.lang-bar{background:var(--black);padding:0.5rem 1.5rem;display:flex;justify-content:flex-end;gap:0.5rem;}
-.lang-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;padding:0.2rem 0.6rem;cursor:pointer;transition:all 0.2s;}
-.lang-btn.active{border-color:var(--gold);color:var(--gold);}
-header{background:var(--black);padding:1.5rem;text-align:center;}
-.logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;letter-spacing:4px;color:var(--warm-white);text-transform:uppercase;}
-.logo span{color:var(--gold);}
-.logo-sub{font-size:0.6rem;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:0.3rem;}
-main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
-.card{background:white;max-width:480px;width:100%;padding:2.5rem;box-shadow:0 4px 30px rgba(0,0,0,0.08);}
-.card-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--stone);}
-.card-icon{font-size:2rem;margin-bottom:0.8rem;}
-.card-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:0.3rem;}
-.card-sub{font-size:0.75rem;color:var(--muted);letter-spacing:1px;}
-.amount-display{background:var(--black);color:white;padding:1.2rem;text-align:center;margin-bottom:2rem;}
-.amount-label{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:0.3rem;}
-.amount-value{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:300;}
-.amount-note{font-size:0.65rem;color:rgba(255,255,255,0.3);display:block;margin-top:0.2rem;letter-spacing:1px;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  font-weight:400;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  background-image:
+    radial-gradient(ellipse at top left, rgba(197,164,103,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(154,123,63,0.06) 0%, transparent 50%);
+}
+
+/* Top bar */
+.topbar{
+  background:var(--ink);
+  padding:0.9rem 2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:relative;
+  z-index:10;
+}
+.topbar::after{
+  content:"";
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+  opacity:0.4;
+}
+.home-link{
+  color:var(--gold-light);
+  font-size:0.7rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  text-decoration:none;
+  font-weight:500;
+  transition:color 0.3s;
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+}
+.home-link:hover{color:#fff;}
+.lang-switch{display:flex;gap:0.3rem;align-items:center;}
+.lang-divider{color:rgba(255,255,255,0.2);font-size:0.7rem;}
+.lang-btn{
+  background:none;
+  border:none;
+  color:rgba(255,255,255,0.4);
+  font-family:'Inter',sans-serif;
+  font-size:0.7rem;
+  letter-spacing:0.2em;
+  font-weight:500;
+  padding:0.3rem 0.5rem;
+  cursor:pointer;
+  transition:color 0.3s;
+}
+.lang-btn:hover{color:#fff;}
+.lang-btn.active{color:var(--gold-light);}
+
+/* Hero header */
+header{
+  background:var(--ink);
+  padding:3rem 1.5rem 4rem;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse at center top, rgba(197,164,103,0.15) 0%, transparent 60%),
+    linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
+  pointer-events:none;
+}
+.hero-mark{
+  display:inline-block;
+  width:36px;
+  height:1px;
+  background:var(--gold);
+  margin-bottom:1.5rem;
+  position:relative;
+  z-index:1;
+}
+.logo{
+  font-family:'Fraunces',serif;
+  font-size:2.2rem;
+  font-weight:300;
+  letter-spacing:0.18em;
+  color:var(--cream);
+  text-transform:uppercase;
+  position:relative;
+  z-index:1;
+  margin-bottom:0.4rem;
+}
+.logo span{
+  color:var(--gold-light);
+  font-style:italic;
+  font-weight:400;
+  letter-spacing:0.05em;
+}
+.logo-tag{
+  font-size:0.68rem;
+  letter-spacing:0.32em;
+  color:rgba(255,255,255,0.45);
+  text-transform:uppercase;
+  font-weight:400;
+  position:relative;
+  z-index:1;
+}
+
+/* Main */
+main{
+  flex:1;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:3.5rem 1.5rem 4rem;
+  margin-top:-2.5rem;
+  position:relative;
+  z-index:2;
+}
+.card{
+  background:#fff;
+  max-width:540px;
+  width:100%;
+  padding:3rem 2.75rem;
+  box-shadow:var(--shadow-card);
+  border:1px solid var(--line);
+  position:relative;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+}
+
+/* Card header */
+.card-header{
+  text-align:center;
+  margin-bottom:2.25rem;
+  padding-bottom:2rem;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.card-header::after{
+  content:"";
+  position:absolute;
+  bottom:-1px;
+  left:50%;
+  transform:translateX(-50%);
+  width:48px;
+  height:1px;
+  background:var(--gold);
+}
+.lock-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:var(--gold-glow);
+  border:1px solid rgba(154,123,63,0.25);
+  margin-bottom:1.25rem;
+}
+.lock-badge svg{width:20px;height:20px;stroke:var(--gold);}
+.eyebrow{
+  font-size:0.68rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:500;
+  margin-bottom:0.6rem;
+}
+.card-title{
+  font-family:'Fraunces',serif;
+  font-size:2rem;
+  font-weight:300;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  line-height:1.15;
+  margin-bottom:0.6rem;
+}
+.card-sub{
+  font-size:0.85rem;
+  color:var(--text-soft);
+  font-weight:400;
+}
+
+/* Amount panel */
+.amount-display{
+  background:linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 100%);
+  color:#fff;
+  padding:1.75rem 1.5rem;
+  text-align:center;
+  margin-bottom:2.25rem;
+  position:relative;
+  border:1px solid rgba(197,164,103,0.2);
+  overflow:hidden;
+}
+.amount-display::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold-light), transparent);
+}
+.amount-display::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at center, rgba(197,164,103,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.amount-label{
+  font-size:0.65rem;
+  letter-spacing:0.32em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.5);
+  display:block;
+  margin-bottom:0.5rem;
+  font-weight:500;
+  position:relative;
+}
+.amount-value{
+  font-family:'Fraunces',serif;
+  font-size:3.25rem;
+  color:var(--gold-light);
+  font-weight:300;
+  line-height:1;
+  letter-spacing:-0.02em;
+  position:relative;
+  display:inline-block;
+}
+.amount-note{
+  font-size:0.72rem;
+  color:rgba(255,255,255,0.5);
+  display:block;
+  margin-top:0.6rem;
+  letter-spacing:0.04em;
+  font-style:italic;
+  position:relative;
+}
+
+/* Form */
+.section-divider{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin:1.75rem 0 1.25rem;
+  font-size:0.65rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  font-weight:500;
+}
+.section-divider::before,
+.section-divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+
 .form-group{margin-bottom:1.1rem;}
-.form-label{display:block;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
-.form-input{width:100%;padding:0.75rem 1rem;border:1px solid var(--stone);background:var(--warm-white);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--text);outline:none;transition:border-color 0.2s;}
-.form-input:focus{border-color:var(--gold);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
-#card-element{padding:0.75rem 1rem;border:1px solid var(--stone);background:var(--warm-white);margin-bottom:0.3rem;}
-#card-errors{font-size:0.7rem;color:var(--error);min-height:1rem;}
-.info-box{background:rgba(74,124,89,0.06);border-left:3px solid var(--success);padding:1rem 1.2rem;margin:1.2rem 0;font-size:0.75rem;color:var(--muted);line-height:1.7;}
-.info-box strong{color:var(--success);}
-.btn-pay{width:100%;padding:1rem;background:var(--gold);color:var(--black);border:none;font-family:'DM Sans',sans-serif;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-top:1.2rem;}
-.btn-pay:hover{background:var(--gold-light);}
+.form-label{
+  display:block;
+  font-size:0.7rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin-bottom:0.5rem;
+  font-weight:500;
+}
+.form-input{
+  width:100%;
+  padding:0.95rem 1.1rem;
+  border:1px solid var(--line);
+  background:var(--cream);
+  font-family:'Inter',sans-serif;
+  font-size:0.95rem;
+  color:var(--ink);
+  outline:none;
+  transition:all 0.25s ease;
+  font-weight:400;
+}
+.form-input::placeholder{color:var(--text-muted);font-weight:400;}
+.form-input:focus{
+  border-color:var(--gold);
+  background:#fff;
+  box-shadow:0 0 0 3px var(--gold-glow);
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;}
+
+#card-element{
+  padding:0.95rem 1.1rem;
+  border:1px solid var(--line);
+  background:var(--cream);
+  margin-bottom:0.4rem;
+  transition:all 0.25s ease;
+}
+#card-element.StripeElement--focus{
+  border-color:var(--gold);
+  background:#fff;
+  box-shadow:0 0 0 3px var(--gold-glow);
+}
+#card-errors{
+  font-size:0.78rem;
+  color:var(--error);
+  min-height:1.2rem;
+  margin-top:0.3rem;
+  font-weight:400;
+}
+
+/* Info boxes */
+.info-box{
+  background:rgba(90,122,79,0.05);
+  border-left:2px solid var(--success);
+  padding:1.1rem 1.25rem;
+  margin:1.5rem 0;
+  font-size:0.82rem;
+  color:var(--text-soft);
+  line-height:1.65;
+}
+.info-box strong{
+  color:var(--success);
+  font-weight:600;
+  display:block;
+  margin-bottom:0.4rem;
+  font-size:0.85rem;
+}
+
+/* Trust list */
+.trust-list{
+  list-style:none;
+  margin:1.5rem 0;
+  display:grid;
+  gap:0.6rem;
+}
+.trust-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:0.7rem;
+  font-size:0.82rem;
+  color:var(--text-soft);
+  line-height:1.5;
+}
+.trust-check{
+  flex-shrink:0;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--gold-glow);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:1px;
+}
+.trust-check svg{width:10px;height:10px;stroke:var(--gold);stroke-width:2.5;fill:none;}
+
+/* Pay button */
+.btn-pay{
+  width:100%;
+  padding:1.15rem;
+  background:var(--ink);
+  color:var(--cream);
+  border:none;
+  font-family:'Inter',sans-serif;
+  font-size:0.78rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.7rem;
+  margin-top:1.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.btn-pay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  opacity:0;
+  transition:opacity 0.3s ease;
+}
+.btn-pay > *{position:relative;z-index:1;}
+.btn-pay:hover:not(:disabled)::before{opacity:1;}
+.btn-pay:hover:not(:disabled){color:var(--ink);transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(154,123,63,0.4);}
 .btn-pay:disabled{opacity:0.5;cursor:not-allowed;}
-.spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:var(--black);border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.btn-pay .arrow{
+  transition:transform 0.3s ease;
+  font-size:1rem;
+}
+.btn-pay:hover:not(:disabled) .arrow{transform:translateX(4px);}
+
+.spinner{
+  width:14px;
+  height:14px;
+  border:2px solid rgba(255,255,255,0.2);
+  border-top-color:var(--cream);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+  display:none;
+}
 .btn-pay.loading .spinner{display:block;}
-.btn-pay.loading .btn-text{opacity:0.5;}
+.btn-pay.loading .btn-text,
+.btn-pay.loading .arrow{display:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.secure-row{display:flex;justify-content:center;gap:1.5rem;margin-top:0.8rem;}
-.secure-badge{font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
-.success-card{display:none;text-align:center;padding:2rem;}
-.success-card.show{display:block;}
-.success-icon{font-size:3rem;margin-bottom:1rem;}
-.success-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:1rem;}
-.success-text{font-size:0.82rem;color:var(--muted);line-height:1.8;}
-footer{background:var(--black);padding:1.5rem;text-align:center;}
-footer p{font-size:0.65rem;color:rgba(255,255,255,0.3);letter-spacing:1px;}
-footer a{color:var(--gold);text-decoration:none;}
+
+/* Secure badges */
+.secure-row{
+  display:flex;
+  justify-content:center;
+  gap:1.5rem;
+  margin-top:1.5rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.secure-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  font-size:0.68rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  font-weight:500;
+}
+.secure-badge svg{width:12px;height:12px;stroke:var(--text-muted);fill:none;stroke-width:2;}
+
+/* Success state */
+.success-card{display:none;text-align:center;padding:1.5rem 0;}
+.success-card.show{display:block;animation:fadeUp 0.6s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.success-icon{
+  width:72px;
+  height:72px;
+  margin:0 auto 1.5rem;
+  border-radius:50%;
+  background:linear-gradient(135deg, rgba(90,122,79,0.1), rgba(90,122,79,0.05));
+  border:1px solid rgba(90,122,79,0.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.success-icon svg{width:32px;height:32px;stroke:var(--success);stroke-width:2;fill:none;}
+.success-title{
+  font-family:'Fraunces',serif;
+  font-size:2rem;
+  font-weight:300;
+  margin-bottom:1rem;
+  color:var(--ink);
+  letter-spacing:-0.01em;
+}
+.success-text{
+  font-size:0.9rem;
+  color:var(--text-soft);
+  line-height:1.8;
+  max-width:380px;
+  margin:0 auto;
+}
+.success-text small{
+  display:block;
+  margin-top:1.25rem;
+  font-size:0.78rem;
+  color:var(--text-muted);
+  font-style:italic;
+}
+
+/* Footer */
+footer{
+  background:var(--ink);
+  padding:2rem 1.5rem;
+  text-align:center;
+  position:relative;
+}
+footer::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+  opacity:0.3;
+}
+.foot-mark{
+  display:inline-block;
+  font-family:'Fraunces',serif;
+  font-style:italic;
+  color:var(--gold-light);
+  font-size:0.95rem;
+  margin-bottom:0.6rem;
+  letter-spacing:0.05em;
+}
+footer p{
+  font-size:0.72rem;
+  color:rgba(255,255,255,0.4);
+  letter-spacing:0.05em;
+  line-height:1.8;
+}
+footer a{color:var(--gold-light);text-decoration:none;transition:color 0.2s;}
+footer a:hover{color:#fff;}
+.foot-sep{margin:0 0.5rem;color:rgba(255,255,255,0.2);}
+
+/* Lang toggle */
 .lang-fr [data-en]{display:none!important;}
 .lang-en [data-fr]{display:none!important;}
-@media(max-width:480px){.form-row{grid-template-columns:1fr;}.card{padding:1.5rem;}}
+
+/* Mobile */
+@media(max-width:560px){
+  .topbar{padding:0.8rem 1.25rem;}
+  header{padding:2.25rem 1rem 3rem;}
+  .logo{font-size:1.7rem;letter-spacing:0.15em;}
+  .logo-tag{font-size:0.6rem;letter-spacing:0.25em;}
+  main{padding:2.5rem 1rem 3rem;}
+  .card{padding:2rem 1.5rem;}
+  .card-title{font-size:1.6rem;}
+  .amount-value{font-size:2.75rem;}
+  .form-row{grid-template-columns:1fr;gap:0;}
+  .secure-row{gap:1rem;}
+  .success-title{font-size:1.6rem;}
+  .foot-sep{display:block;height:0.4rem;visibility:hidden;}
+}
+
+/* Subtle entrance */
+.card{animation:cardIn 0.7s ease both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body class="lang-fr">
 
-<div class="lang-bar" style="justify-content:space-between;">
-  <a href="https://soleastay.com" style="color:var(--gold);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">
-    <span data-fr>← Accueil</span><span data-en>← Home</span>
+<div class="topbar">
+  <a href="https://soleastay.com" class="home-link">
+    <span data-fr>← Retour au site</span><span data-en>← Back to site</span>
   </a>
-  <div style="display:flex;gap:0.5rem;">
+  <div class="lang-switch">
     <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <span class="lang-divider">/</span>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
   </div>
 </div>
 
 <header>
-  <a href="https://soleastay.com" style="text-decoration:none;"><div class="logo">Solea<span>Stay</span></div></a>
-  <div class="logo-sub" data-fr>Caution de séjour</div>
-  <div class="logo-sub" data-en>Security Deposit</div>
+  <span class="hero-mark"></span>
+  <a href="https://soleastay.com" style="text-decoration:none;">
+    <div class="logo">Solea<span>Stay</span></div>
+  </a>
+  <div class="logo-tag" data-fr>Marseille · Provence</div>
+  <div class="logo-tag" data-en>Marseille · Provence</div>
 </header>
 
 <main>
   <div class="card">
     <div id="form-section">
       <div class="card-header">
-        <div class="card-icon">🔒</div>
+        <div class="lock-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div class="eyebrow" data-fr>Réservation sécurisée</div>
+        <div class="eyebrow" data-en>Secure reservation</div>
         <h1 class="card-title" data-fr>Caution de séjour</h1>
         <h1 class="card-title" data-en>Security Deposit</h1>
-        <p class="card-sub" data-fr>Appartement SoleaStay — Marseille Centre</p>
-        <p class="card-sub" data-en>SoleaStay Apartment — Marseille City Centre</p>
+        <p class="card-sub" data-fr>Appartement SoleaStay · Marseille Centre</p>
+        <p class="card-sub" data-en>SoleaStay Apartment · Marseille City Centre</p>
       </div>
 
       <div class="amount-display">
-        <span class="amount-label" data-fr>Caution bloquée</span>
-        <span class="amount-label" data-en>Deposit blocked</span>
+        <span class="amount-label" data-fr>Montant bloqué</span>
+        <span class="amount-label" data-en>Amount blocked</span>
         <div class="amount-value">€100</div>
-        <span class="amount-note" data-fr>Jamais débité — libéré 24h après votre départ</span>
-        <span class="amount-note" data-en>Never charged — released 24h after checkout</span>
+        <span class="amount-note" data-fr>Aucun débit — libéré 24 h après votre départ</span>
+        <span class="amount-note" data-en>No charge — released 24 h after checkout</span>
       </div>
+
+      <div class="section-divider" data-fr>Vos coordonnées</div>
+      <div class="section-divider" data-en>Your details</div>
 
       <div class="form-group">
         <label class="form-label" data-fr>Prénom & Nom</label>
         <label class="form-label" data-en>First & Last Name</label>
-        <input type="text" class="form-input" id="guest-name" placeholder="Marie Dupont">
+        <input type="text" class="form-input" id="guest-name" placeholder="Marie Dupont" autocomplete="name">
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="guest-email" placeholder="marie@example.com">
+        <input type="email" class="form-input" id="guest-email" placeholder="marie@example.com" autocomplete="email">
       </div>
       <div class="form-group">
         <label class="form-label" data-fr>Téléphone</label>
         <label class="form-label" data-en>Phone</label>
-        <input type="tel" class="form-input" id="guest-phone" placeholder="+33 6 xx xx xx xx">
+        <input type="tel" class="form-input" id="guest-phone" placeholder="+33 6 00 00 00 00" autocomplete="tel">
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" data-fr>Date d'arrivée</label>
-          <label class="form-label" data-en>Check-in date</label>
+          <label class="form-label" data-fr>Arrivée</label>
+          <label class="form-label" data-en>Check-in</label>
           <input type="date" class="form-input" id="checkin">
         </div>
         <div class="form-group">
-          <label class="form-label" data-fr>Date de départ</label>
-          <label class="form-label" data-en>Check-out date</label>
+          <label class="form-label" data-fr>Départ</label>
+          <label class="form-label" data-en>Check-out</label>
           <input type="date" class="form-input" id="checkout">
         </div>
       </div>
+
+      <div class="section-divider" data-fr>Paiement</div>
+      <div class="section-divider" data-en>Payment</div>
+
       <div class="form-group">
         <label class="form-label" data-fr>Carte bancaire</label>
         <label class="form-label" data-en>Card details</label>
         <div id="card-element"></div>
-        <div id="card-errors"></div>
+        <div id="card-errors" role="alert"></div>
       </div>
-      <div class="info-box">
-        <strong data-fr>✅ Cette somme est BLOQUÉE — jamais débitée</strong>
-        <strong data-en>✅ This amount is BLOCKED — never charged</strong><br>
-        <span data-fr>Votre carte sera autorisée pour €100 mais aucun débit n'aura lieu. La caution sera libérée automatiquement 24h après votre départ si l'appartement est en bon état.</span>
-        <span data-en>Your card will be authorized for €100 but no charge will occur. The deposit will be automatically released 24h after your departure if the apartment is in good condition.</span>
-      </div>
+
+      <ul class="trust-list">
+        <li>
+          <span class="trust-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <span data-fr><strong style="color:var(--ink);font-weight:500;">Aucun débit</strong> — votre carte est uniquement pré-autorisée pour €100.</span>
+          <span data-en><strong style="color:var(--ink);font-weight:500;">No charge</strong> — your card is only pre-authorized for €100.</span>
+        </li>
+        <li>
+          <span class="trust-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <span data-fr><strong style="color:var(--ink);font-weight:500;">Libération automatique</strong> 24 h après votre départ si l'appartement est en bon état.</span>
+          <span data-en><strong style="color:var(--ink);font-weight:500;">Automatic release</strong> 24 h after checkout if the apartment is in good condition.</span>
+        </li>
+        <li>
+          <span class="trust-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <span data-fr><strong style="color:var(--ink);font-weight:500;">Paiement sécurisé</strong> par Stripe — chiffrement bancaire de niveau PCI-DSS.</span>
+          <span data-en><strong style="color:var(--ink);font-weight:500;">Secured by Stripe</strong> — PCI-DSS bank-grade encryption.</span>
+        </li>
+      </ul>
+
       <button class="btn-pay" id="pay-btn" onclick="handleDeposit()">
         <div class="spinner" id="spinner"></div>
-        <span class="btn-text" data-fr>Autoriser la caution de €100 →</span>
-        <span class="btn-text" data-en>Authorize €100 deposit →</span>
+        <span class="btn-text" data-fr>Autoriser la caution</span>
+        <span class="btn-text" data-en>Authorize deposit</span>
+        <span class="arrow">→</span>
       </button>
+
       <div class="secure-row">
-        <span class="secure-badge">🔒 SSL</span>
-        <span class="secure-badge">💳 Stripe</span>
-        <span class="secure-badge">✓ PCI</span>
+        <span class="secure-badge">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          SSL
+        </span>
+        <span class="secure-badge">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Stripe
+        </span>
+        <span class="secure-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V7l-9-5z"/></svg>
+          PCI-DSS
+        </span>
       </div>
     </div>
 
     <div class="success-card" id="success-card">
-      <div class="success-icon">✅</div>
-      <h2 class="success-title" data-fr>Caution enregistrée !</h2>
-      <h2 class="success-title" data-en>Deposit registered!</h2>
-      <p class="success-text" data-fr>Votre caution de €100 a été enregistrée avec succès. Un email de confirmation vous a été envoyé.<br><br>À bientôt à Marseille ! 🌊<br><br><small>La caution sera libérée automatiquement 24h après votre départ.</small></p>
-      <p class="success-text" data-en>Your €100 deposit has been successfully registered. A confirmation email has been sent to you.<br><br>See you soon in Marseille! 🌊<br><br><small>The deposit will be automatically released 24h after your departure.</small></p>
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="eyebrow" data-fr>Confirmation</div>
+      <div class="eyebrow" data-en>Confirmation</div>
+      <h2 class="success-title" data-fr>Caution enregistrée</h2>
+      <h2 class="success-title" data-en>Deposit registered</h2>
+      <p class="success-text" data-fr>
+        Votre caution de €100 a été enregistrée avec succès.<br>
+        Un email de confirmation vient de vous être envoyé.<br><br>
+        À très bientôt à Marseille.
+        <small>La caution sera libérée automatiquement 24 h après votre départ.</small>
+      </p>
+      <p class="success-text" data-en>
+        Your €100 deposit has been successfully registered.<br>
+        A confirmation email has just been sent to you.<br><br>
+        See you very soon in Marseille.
+        <small>The deposit will be automatically released 24 h after your checkout.</small>
+      </p>
     </div>
   </div>
 </main>
 
 <footer>
-  <p>SoleaStay · 7 Rue de la Prison, 13002 Marseille · <a href="mailto:soleastay.marseille@gmail.com">soleastay.marseille@gmail.com</a> · <a href="tel:+33652557141">+33 6 52 55 71 41</a></p>
+  <div class="foot-mark">Solea<em>Stay</em></div>
+  <p>
+    7 Rue de la Prison, 13002 Marseille
+    <span class="foot-sep">·</span>
+    <a href="mailto:soleastay.marseille@gmail.com">soleastay.marseille@gmail.com</a>
+    <span class="foot-sep">·</span>
+    <a href="tel:+33652557141">+33 6 52 55 71 41</a>
+  </p>
 </footer>
 
 <script>
@@ -175,8 +752,15 @@ const stripe = Stripe(CONFIG.stripeKey);
 const elements = stripe.elements();
 const cardElement = elements.create('card', {
   style: {
-    base: { fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2a2520', '::placeholder': { color: '#8a8278' } },
-    invalid: { color: '#8b2c2c' }
+    base: {
+      fontFamily: "'Inter', -apple-system, sans-serif",
+      fontSize: '15px',
+      fontWeight: '400',
+      color: '#1a1612',
+      '::placeholder': { color: '#a89e8c' },
+      iconColor: '#9a7b3f'
+    },
+    invalid: { color: '#a04848', iconColor: '#a04848' }
   }
 });
 cardElement.mount('#card-element');
@@ -189,6 +773,11 @@ const today = new Date().toISOString().split('T')[0];
 document.getElementById('checkin').min = today;
 document.getElementById('checkout').min = today;
 
+// Auto-update checkout min based on checkin
+document.getElementById('checkin').addEventListener('change', e => {
+  document.getElementById('checkout').min = e.target.value || today;
+});
+
 async function handleDeposit() {
   const name = document.getElementById('guest-name').value.trim();
   const email = document.getElementById('guest-email').value.trim();
@@ -197,13 +786,17 @@ async function handleDeposit() {
   const checkOut = document.getElementById('checkout').value;
 
   if (!name || !email || !checkIn || !checkOut) {
-    alert(document.body.classList.contains('lang-fr') ? 'Veuillez remplir tous les champs obligatoires.' : 'Please fill in all required fields.');
+    const msg = document.body.classList.contains('lang-fr')
+      ? 'Veuillez remplir tous les champs obligatoires.'
+      : 'Please fill in all required fields.';
+    document.getElementById('card-errors').textContent = msg;
     return;
   }
 
   const btn = document.getElementById('pay-btn');
   btn.classList.add('loading');
   btn.disabled = true;
+  document.getElementById('card-errors').textContent = '';
 
   try {
     const res = await fetch(`${CONFIG.apiUrl}/create-deposit`, {
@@ -223,9 +816,10 @@ async function handleDeposit() {
 
     document.getElementById('form-section').style.display = 'none';
     document.getElementById('success-card').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
   } catch (err) {
-    document.getElementById('card-errors').textContent = err.message || 'Une erreur est survenue.';
+    document.getElementById('card-errors').textContent = err.message || (document.body.classList.contains('lang-fr') ? 'Une erreur est survenue.' : 'An error occurred.');
     btn.classList.remove('loading');
     btn.disabled = false;
   }
