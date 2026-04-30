@@ -332,23 +332,25 @@ main{
 }
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;}
 
-#card-element{
+.stripe-field{
   padding:0.95rem 1.1rem;
   border:1px solid var(--line);
   background:var(--cream);
-  margin-bottom:0.4rem;
   transition:all 0.25s ease;
 }
-#card-element.StripeElement--focus{
+.stripe-field.StripeElement--focus{
   border-color:var(--gold);
   background:#fff;
   box-shadow:0 0 0 3px var(--gold-glow);
+}
+.stripe-field.StripeElement--invalid{
+  border-color:var(--error);
 }
 #card-errors{
   font-size:0.78rem;
   color:var(--error);
   min-height:1.2rem;
-  margin-top:0.3rem;
+  margin-top:0.5rem;
   font-weight:400;
 }
 
@@ -654,11 +656,22 @@ footer a:hover{color:#fff;}
       <div class="section-divider" data-en>Payment</div>
 
       <div class="form-group">
-        <label class="form-label" data-fr>Carte bancaire</label>
-        <label class="form-label" data-en>Card details</label>
-        <div id="card-element"></div>
-        <div id="card-errors" role="alert"></div>
+        <label class="form-label" data-fr>Numéro de carte</label>
+        <label class="form-label" data-en>Card number</label>
+        <div id="card-number-element" class="stripe-field"></div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-fr>Date d'expiration</label>
+          <label class="form-label" data-en>Expiry date</label>
+          <div id="card-expiry-element" class="stripe-field"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CVC</label>
+          <div id="card-cvc-element" class="stripe-field"></div>
+        </div>
+      </div>
+      <div id="card-errors" role="alert"></div>
 
       <ul class="trust-list">
         <li>
@@ -750,22 +763,32 @@ function setLang(lang) {
 // Init Stripe
 const stripe = Stripe(CONFIG.stripeKey);
 const elements = stripe.elements();
-const cardElement = elements.create('card', {
-  style: {
-    base: {
-      fontFamily: "'Inter', -apple-system, sans-serif",
-      fontSize: '15px',
-      fontWeight: '400',
-      color: '#1a1612',
-      '::placeholder': { color: '#a89e8c' },
-      iconColor: '#9a7b3f'
-    },
-    invalid: { color: '#a04848', iconColor: '#a04848' }
-  }
-});
-cardElement.mount('#card-element');
-cardElement.on('change', e => {
-  document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+
+const stripeStyle = {
+  base: {
+    fontFamily: "'Inter', -apple-system, sans-serif",
+    fontSize: '15px',
+    fontWeight: '400',
+    color: '#1a1612',
+    '::placeholder': { color: '#a89e8c' },
+    iconColor: '#9a7b3f'
+  },
+  invalid: { color: '#a04848', iconColor: '#a04848' }
+};
+
+const cardNumber = elements.create('cardNumber', { style: stripeStyle, showIcon: true });
+const cardExpiry = elements.create('cardExpiry', { style: stripeStyle });
+const cardCvc = elements.create('cardCvc', { style: stripeStyle });
+
+cardNumber.mount('#card-number-element');
+cardExpiry.mount('#card-expiry-element');
+cardCvc.mount('#card-cvc-element');
+
+// Show errors from any of the 3 fields
+[cardNumber, cardExpiry, cardCvc].forEach(el => {
+  el.on('change', e => {
+    document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+  });
 });
 
 // Set min date to today
@@ -809,7 +832,7 @@ async function handleDeposit() {
     const { clientSecret } = await res.json();
 
     const { error } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card: cardElement, billing_details: { name, email } }
+      payment_method: { card: cardNumber, billing_details: { name, email } }
     });
 
     if (error) throw error;
