@@ -515,6 +515,262 @@ main{
   font-style:italic;
 }
 
+/* International / PayPal fallback */
+.intl-fallback{
+  margin-top:2rem;
+  padding-top:1.75rem;
+  border-top:1px solid var(--line);
+  text-align:center;
+}
+.intl-eyebrow{
+  font-size:0.62rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  font-weight:500;
+  margin-bottom:0.5rem;
+  display:inline-flex;
+  align-items:center;
+  gap:0.6rem;
+}
+.intl-eyebrow::before,
+.intl-eyebrow::after{
+  content:"";
+  display:inline-block;
+  width:24px;
+  height:1px;
+  background:var(--line);
+}
+.intl-title{
+  font-family:'Fraunces',serif;
+  font-size:1.15rem;
+  font-weight:400;
+  color:var(--ink);
+  margin-bottom:0.5rem;
+  letter-spacing:-0.005em;
+}
+.intl-text{
+  font-size:0.82rem;
+  color:var(--text-soft);
+  line-height:1.65;
+  max-width:380px;
+  margin:0 auto 1.25rem;
+}
+.paypal-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  background:var(--cream);
+  border:1px solid var(--line);
+  padding:0.95rem 1.15rem;
+  text-align:left;
+  margin:0 auto 0.7rem;
+  max-width:380px;
+}
+.paypal-logo{
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  font-family:'Fraunces',serif;
+  font-style:italic;
+  font-size:1.1rem;
+  font-weight:500;
+  color:#003087;
+  letter-spacing:-0.01em;
+  flex-shrink:0;
+}
+.paypal-logo span:last-child{color:#0070ba;}
+.paypal-email{
+  font-size:0.82rem;
+  color:var(--ink);
+  font-weight:500;
+  letter-spacing:0.01em;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.copy-btn{
+  background:none;
+  border:1px solid var(--line);
+  color:var(--text-soft);
+  font-family:'Inter',sans-serif;
+  font-size:0.62rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  font-weight:500;
+  padding:0.45rem 0.7rem;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  flex-shrink:0;
+}
+.copy-btn:hover{
+  border-color:var(--gold);
+  color:var(--gold);
+}
+.copy-btn.copied{
+  background:var(--success);
+  border-color:var(--success);
+  color:#fff;
+}
+
+/* Wise card */
+.wise-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  background:var(--cream);
+  border:1px solid var(--line);
+  padding:0.95rem 1.15rem;
+  text-align:left;
+  margin:0 auto;
+  max-width:380px;
+  text-decoration:none;
+  transition:all 0.25s ease;
+}
+.wise-card:hover{
+  border-color:#9fe870;
+  background:#f5fdee;
+  transform:translateY(-1px);
+}
+.wise-logo{
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  font-family:'Inter',sans-serif;
+  font-size:0.95rem;
+  font-weight:600;
+  color:#163300;
+  letter-spacing:-0.01em;
+  flex-shrink:0;
+}
+.wise-mark{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#9fe870;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.7rem;
+  font-weight:700;
+  color:#163300;
+}
+.wise-handle{
+  font-size:0.82rem;
+  color:var(--text-soft);
+  font-weight:400;
+  font-family:'Inter',sans-serif;
+  flex:1;
+  text-align:left;
+  margin-left:0.5rem;
+}
+.wise-arrow{
+  color:#163300;
+  font-size:0.9rem;
+  flex-shrink:0;
+  font-weight:600;
+}
+.divider-or{
+  text-align:center;
+  font-size:0.62rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  font-weight:500;
+  margin:0.7rem 0;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.8rem;
+}
+.divider-or::before,
+.divider-or::after{
+  content:"";
+  display:block;
+  width:36px;
+  height:1px;
+  background:var(--line);
+}
+.wise-note{
+  font-size:0.7rem;
+  color:var(--text-muted);
+  text-align:center;
+  margin-top:0.5rem;
+  font-style:italic;
+}
+
+/* Wero card */
+.wero-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  background:var(--cream);
+  border:1px solid var(--line);
+  padding:0.95rem 1.15rem;
+  text-align:left;
+  margin:0 auto 0.5rem;
+  max-width:380px;
+  transition:all 0.25s ease;
+}
+.wero-card:hover{
+  border-color:#e91e63;
+  background:#fef5f8;
+}
+.wero-logo{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  font-family:'Inter',sans-serif;
+  font-size:0.95rem;
+  font-weight:600;
+  color:#1a1612;
+  letter-spacing:-0.005em;
+  flex-shrink:0;
+}
+.wero-mark{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#5b3eb1 0%,#e91e63 100%);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.7rem;
+  font-weight:700;
+  color:#fff;
+}
+.wero-number{
+  font-size:0.82rem;
+  color:var(--ink);
+  font-weight:500;
+  letter-spacing:0.02em;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+  flex:1;
+  text-align:left;
+  margin-left:0.3rem;
+}
+.wero-note{
+  font-size:0.7rem;
+  color:var(--text-muted);
+  text-align:center;
+  margin-top:0.4rem;
+  margin-bottom:0.5rem;
+  font-style:italic;
+}
+.intl-note{
+  font-size:0.72rem;
+  color:var(--text-muted);
+  line-height:1.55;
+  margin-top:1rem;
+  font-style:italic;
+}
+
 /* Footer */
 footer{
   background:var(--ink);
@@ -712,6 +968,58 @@ footer a:hover{color:#fff;}
           PCI-DSS
         </span>
       </div>
+
+      <div class="intl-fallback">
+        <div class="intl-eyebrow" data-fr>Voyageurs internationaux</div>
+        <div class="intl-eyebrow" data-en>International guests</div>
+        <h3 class="intl-title" data-fr>Carte non acceptée ?</h3>
+        <h3 class="intl-title" data-en>Card not accepted?</h3>
+        <p class="intl-text" data-fr>Si votre carte n'est pas acceptée par Stripe, vous pouvez régler la caution via Wero (banques françaises &amp; européennes), PayPal (sans compte requis) ou Wise (utilisateurs Wise). Elle sera remboursée 24 h après votre départ.</p>
+        <p class="intl-text" data-en>If your card isn't accepted by Stripe, you can send the deposit via Wero (French &amp; European banks), PayPal (no account needed) or Wise (existing Wise users). It will be refunded 24 h after your checkout.</p>
+
+        <div class="wero-card">
+          <span class="wero-logo">
+            <span class="wero-mark">W</span>
+            Wero
+          </span>
+          <span class="wero-number" id="wero-number">+33 6 52 55 71 41</span>
+          <button type="button" class="copy-btn" onclick="copyWero()" id="copy-wero-btn">
+            <span data-fr>Copier</span><span data-en>Copy</span>
+          </button>
+        </div>
+        <p class="wero-note" data-fr>Pour les clients français — paiement instantané depuis votre app bancaire (BNP, CA, BPCE, SG, etc.).</p>
+        <p class="wero-note" data-en>For French &amp; European bank users — instant payment from your banking app (BNP, CA, BPCE, SG, etc.).</p>
+
+        <div class="divider-or">
+          <span data-fr>ou</span><span data-en>or</span>
+        </div>
+
+        <div class="paypal-card">
+          <span class="paypal-logo"><span>Pay</span><span>Pal</span></span>
+          <span class="paypal-email" id="paypal-email">nived52@gmail.com</span>
+          <button type="button" class="copy-btn" onclick="copyPaypal()" id="copy-btn">
+            <span data-fr>Copier</span><span data-en>Copy</span>
+          </button>
+        </div>
+
+        <div class="divider-or">
+          <span data-fr>ou</span><span data-en>or</span>
+        </div>
+
+        <a href="https://wise.com/pay/me/nivedm2" class="wise-card" target="_blank" rel="noopener">
+          <span class="wise-logo">
+            <span class="wise-mark">W</span>
+            Wise
+          </span>
+          <span class="wise-handle">@nivedm2</span>
+          <span class="wise-arrow">→</span>
+        </a>
+        <p class="wise-note" data-fr>Pour les utilisateurs Wise — paiement instantané dans n'importe quelle devise au taux mid-market.</p>
+        <p class="wise-note" data-en>For existing Wise users — instant payment in any currency at the mid-market rate.</p>
+
+        <p class="intl-note" data-fr>Indiquez votre nom et vos dates de séjour dans la note du paiement, puis envoyez-nous un email à <a href="mailto:soleastay.marseille@gmail.com" style="color:var(--gold);text-decoration:none;">soleastay.marseille@gmail.com</a> pour confirmation.</p>
+        <p class="intl-note" data-en>Add your name and stay dates in the payment note, then email us at <a href="mailto:soleastay.marseille@gmail.com" style="color:var(--gold);text-decoration:none;">soleastay.marseille@gmail.com</a> for confirmation.</p>
+      </div>
     </div>
 
     <div class="success-card" id="success-card">
@@ -800,6 +1108,49 @@ document.getElementById('checkout').min = today;
 document.getElementById('checkin').addEventListener('change', e => {
   document.getElementById('checkout').min = e.target.value || today;
 });
+
+function copyToClipboard(text, btn) {
+  const isFR = document.body.classList.contains('lang-fr');
+
+  const showCopied = () => {
+    btn.classList.add('copied');
+    const labels = btn.querySelectorAll('span');
+    const original = { fr: labels[0].textContent, en: labels[1].textContent };
+    labels[0].textContent = 'Copié ✓';
+    labels[1].textContent = 'Copied ✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      labels[0].textContent = original.fr;
+      labels[1].textContent = original.en;
+    }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+      window.prompt(isFR ? 'Copiez ce texte :' : 'Copy this text:', text);
+    });
+  } else {
+    const input = document.createElement('input');
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    try { document.execCommand('copy'); showCopied(); }
+    catch(e) { window.prompt(isFR ? 'Copiez ce texte :' : 'Copy this text:', text); }
+    document.body.removeChild(input);
+  }
+}
+
+function copyPaypal() {
+  const email = document.getElementById('paypal-email').textContent.trim();
+  const btn = document.getElementById('copy-btn');
+  copyToClipboard(email, btn);
+}
+
+function copyWero() {
+  const number = document.getElementById('wero-number').textContent.trim();
+  const btn = document.getElementById('copy-wero-btn');
+  copyToClipboard(number, btn);
+}
 
 async function handleDeposit() {
   const name = document.getElementById('guest-name').value.trim();
